@@ -53,7 +53,7 @@ export function createOpslyMarkdownComponents(
   const userDiv = base?.div
   const userPre = base?.pre
   const rawCode = base?.code
-  const safeCode = createSafeCodeComponent(rawCode)
+  const safeCode = createSafeCodeComponent(rawCode, userPre)
 
   return {
     ...(base ?? {}),
