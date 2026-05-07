@@ -1,0 +1,59 @@
+{
+  "name": "opsly-mask",
+  "version": "0.5.0",
+  "description": "Semantic secure fenced markdown for react-markdown (mask/reveal UI; styling in your app)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "examples"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm build",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "markdown",
+    "react-markdown",
+    "remark",
+    "secure-block",
+    "masked-content",
+    "opsly"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.14.0",
+    "mdast-util-to-hast": "^13.2.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.4",
+    "@types/mdast": "^4.0.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "remark-rehype": "^11.1.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.11"
+  }
+}

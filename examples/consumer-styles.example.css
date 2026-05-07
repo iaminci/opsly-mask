@@ -1,0 +1,49 @@
+/**
+ * Example: style secure fences like the rest of your markdown code blocks.
+ * One `pre` / `code` story — avoid duplicating a parallel widget shell.
+ * This file is not imported by the package.
+ */
+
+/* Shared chrome for all fenced blocks in your MD surface */
+.md pre {
+  margin: 1rem 0;
+  padding: 0.65rem 0.75rem;
+  padding-inline-end: 2.75rem; /* room for optional toolbar controls */
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  background: #fafafa;
+  color: #171717;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .md pre {
+    border-color: #3f3f46;
+    background: #18181b;
+    color: #fafafa;
+  }
+}
+
+/* Secure fences use the same `pre`; only tweak mask-specific pieces */
+pre[data-opsly-mask] [data-opsly-mask-toggle] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.45;
+}
+
+pre[data-opsly-mask] [data-opsly-mask-toggle]:hover,
+pre[data-opsly-mask] [data-opsly-mask-toggle]:focus-visible {
+  opacity: 1;
+}
