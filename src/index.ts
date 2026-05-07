@@ -1,4 +1,11 @@
-export { SecureBlock, type SecureBlockProps } from './SecureBlock.js'
+export {
+  SecureBlock,
+  useSecureFenceBehavior,
+  OPSLY_MASK_TOGGLE_ATTR,
+  type SecureBlockOptions,
+  type SecureBlockProps,
+  type SecureFenceBehavior,
+} from './SecureBlock.js'
 export {
   OpslyMarkdown,
   createOpslyMarkdownComponents,

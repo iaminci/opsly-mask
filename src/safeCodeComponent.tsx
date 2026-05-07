@@ -1,6 +1,6 @@
 import { createElement, type ComponentType } from 'react'
 import type { Components } from 'react-markdown'
-import { SecureBlock } from './SecureBlock.js'
+import { SecureBlock, type SecureBlockOptions } from './SecureBlock.js'
 import {
   type MarkdownCodeProps,
   toSpreadSafeCodeProps,
@@ -15,11 +15,14 @@ const LANGUAGE_SECURE_RE = /\blanguage-secure\b/
  *
  * Fenced blocks that still reach the renderer as `code` with `language-secure`
  * (for example when remark transformers are not run on the tree) are wrapped in
- * {@link SecureBlock} so the mask/reveal UI still applies.
+ * {@link SecureBlock} so the mask/reveal behavior still applies.
+ *
+ * @param secureBlockOptions Optional props for fallback `language-secure` fences (e.g. `groupLabel`); no UI bundled.
  */
 export function createSafeCodeComponent(
   userCode: Components['code'] | undefined,
   userPre?: Components['pre'],
+  secureBlockOptions?: SecureBlockOptions,
 ): NonNullable<Components['code']> {
   return function SafeCode(props: MarkdownCodeProps) {
     const { inline, className, children, node, ...rest } = props
@@ -34,7 +37,11 @@ export function createSafeCodeComponent(
 
     if (isOuterSecureLanguageFence) {
       return (
-        <SecureBlock pre={userPre} code={userCode ?? 'code'}>
+        <SecureBlock
+          pre={userPre}
+          code={userCode ?? 'code'}
+          {...secureBlockOptions}
+        >
           {children}
         </SecureBlock>
       )

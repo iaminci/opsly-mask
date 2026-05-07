@@ -1,17 +1,28 @@
 import {
+  createContext,
   createElement,
+  useContext,
+  useMemo,
+  useState,
+  useId,
   type ComponentProps,
   type ComponentType,
   type CSSProperties,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
 } from 'react'
-import { useId, useMemo, useState } from 'react'
 import type { Components } from 'react-markdown'
-import { Eye, EyeOff } from 'lucide-react'
 import {
   type MarkdownCodeProps,
   toSpreadSafeCodeProps,
 } from './toSpreadSafeCodeProps.js'
+
+/**
+ * Recommended DOM attribute for the app-provided reveal/mask focusable control
+ * (`[data-opsly-mask-toggle]` in CSS selectors). Not emitted by the package.
+ */
+export const OPSLY_MASK_TOGGLE_ATTR = 'data-opsly-mask-toggle'
 
 /**
  * Fixed-length mask; does not reflect secret length.
@@ -34,29 +45,6 @@ const visuallyHidden: CSSProperties = {
   borderWidth: 0,
 }
 
-/** Subtle icon: smaller stroke so the control stays secondary to the code surface. */
-const iconSize: CSSProperties = {
-  width: '0.75em',
-  height: '0.75em',
-  display: 'block',
-}
-
-/**
- * Corner affordance only — layout/semantics; chrome (opacity, color) in app CSS.
- */
-const togglePosition: CSSProperties = {
-  position: 'absolute',
-  top: '0.5em',
-  right: '0.5em',
-  zIndex: 1,
-  padding: '0.15em',
-  margin: 0,
-  border: 'none',
-  background: 'transparent',
-  cursor: 'pointer',
-  lineHeight: 1,
-}
-
 type Extra = import('react-markdown').ExtraProps
 type PreProps = ComponentProps<'pre'> &
   Extra & {
@@ -66,6 +54,56 @@ type PreProps = ComponentProps<'pre'> &
 type CodeProps = MarkdownCodeProps & {
   'data-opsly-mask-content'?: boolean | string | undefined
 }
+
+/**
+ * Reveal behavior for one secure fence instance. Use from your `components.pre`
+ * (or descendants) inside `SecureBlock` via {@link useSecureFenceBehavior}.
+ */
+export type SecureFenceBehavior = Readonly<{
+  /** Literal secret visible (vs fixed-length mask). */
+  revealed: boolean
+  setRevealed: Dispatch<SetStateAction<boolean>>
+  toggle: () => void
+  /** `id` of the fenced `<code>` — pair with `aria-controls` on your toggle. */
+  contentId: string
+  /** `id` on the visually hidden group name span (`aria-labelledby` on `pre`). */
+  groupLabelId: string
+}>
+
+const SecureFenceBehaviorContext = createContext<SecureFenceBehavior | null>(
+  null,
+)
+
+/**
+ * Subscribe to reveal state / handlers for the innermost surrounding secure fence.
+ * Returns `null` outside `SecureBlock` (including normal fenced `pre`).
+ */
+export function useSecureFenceBehavior(): SecureFenceBehavior | null {
+  return useContext(SecureFenceBehaviorContext)
+}
+
+type ExtraChildProps = Omit<SecureBlockProps, 'pre' | 'code' | 'children'>
+
+export type SecureBlockProps = {
+  children?: ReactNode
+  /**
+   * Same `components.pre` you pass to `react-markdown`, so secure fences reuse
+   * your code-block wrapper (padding, radius, background, scroll, etc.).
+   */
+  pre?: Components['pre']
+  /**
+   * Same `components.code` you pass to `react-markdown`, for typography and
+   * highlighter shells that target `code` / `language-*`.
+   */
+  code?: Components['code']
+  /**
+   * Accessible name fragment for `role="group"` (`aria-labelledby`). Not a toggle.
+   */
+  groupLabel?: string
+}
+
+/** Options passed through markdown helpers (everything except pipeline `pre` / `code` / fence `children`). */
+export type SecureBlockOptions = ExtraChildProps
 
 function renderPre(
   P: Components['pre'] | undefined,
@@ -101,75 +139,67 @@ function normalizeSecretText(children: ReactNode): string {
   return ''
 }
 
-export type SecureBlockProps = {
-  children?: ReactNode
-  /**
-   * Same `components.pre` you pass to `react-markdown`, so secure fences reuse
-   * your code-block wrapper (padding, radius, background, scroll, etc.).
-   */
-  pre?: Components['pre']
-  /**
-   * Same `components.code` you pass to `react-markdown`, for typography and
-   * highlighter shells that target `code` / `language-*`.
-   */
-  code?: Components['code']
-}
+const DEFAULT_GROUP_LABEL = 'Protected content'
 
 /**
- * Native `pre` / `code` fence: mask and reveal are the same code surface;
- * revealed payload is literal text (whitespace-preserving), not prose markdown.
+ * Native `pre` / `code` fence: mask and reveal live on the same code surface;
+ * the revealed payload is literal text (whitespace-preserving), not prose markdown.
+ *
+ * The package renders **no** reveal control. Use {@link useSecureFenceBehavior}
+ * from your `components.pre` to attach buttons, toolbar actions, keyboard
+ * shortcuts, etc.
  */
 export function SecureBlock(props: SecureBlockProps) {
-  const { children, pre: PreComponent, code: CodeComponent } = props
+  const { children, pre: PreComponent, code: CodeComponent, groupLabel } =
+    props
+  const resolvedGroupLabel = groupLabel ?? DEFAULT_GROUP_LABEL
   const baseId = useId()
   const labelId = `${baseId}-label`
+  const contentId = `${baseId}-mask-content`
   const [revealed, setRevealed] = useState(false)
 
   const secretText = useMemo(() => normalizeSecretText(children), [children])
 
-  const toggle = () => setRevealed((v) => !v)
+  const behavior = useMemo(
+    (): SecureFenceBehavior => ({
+      revealed,
+      setRevealed,
+      toggle: () => setRevealed((v) => !v),
+      contentId,
+      groupLabelId: labelId,
+    }),
+    [revealed, setRevealed, contentId, labelId],
+  )
 
   const preProps: PreProps = {
     'data-opsly-mask': true,
     'data-revealed': revealed ? 'true' : 'false',
     role: 'group',
     'aria-labelledby': labelId,
-    style: { position: 'relative' },
   }
 
   const codeChildren = revealed ? secretText : MASK_DISPLAY
 
   const codeProps: CodeProps = {
+    id: contentId,
     className: SECURE_LANG_CLASS,
     'data-opsly-mask-content': true,
     children: codeChildren,
     ...(!revealed ? { 'aria-hidden': true as const } : {}),
   }
 
-  return renderPre(
-    PreComponent,
-    preProps,
+  const inner = (
     <>
       <span id={labelId} style={visuallyHidden}>
-        Protected content
+        {resolvedGroupLabel}
       </span>
-      <button
-        type="button"
-        data-opsly-mask-toggle
-        onClick={toggle}
-        aria-pressed={revealed}
-        aria-label={
-          revealed ? 'Hide protected content' : 'Show protected content'
-        }
-        style={togglePosition}
-      >
-        {revealed ? (
-          <EyeOff style={iconSize} strokeWidth={1.5} aria-hidden />
-        ) : (
-          <Eye style={iconSize} strokeWidth={1.5} aria-hidden />
-        )}
-      </button>
       {renderCode(CodeComponent, codeProps)}
-    </>,
+    </>
+  )
+
+  return (
+    <SecureFenceBehaviorContext.Provider value={behavior}>
+      {renderPre(PreComponent, preProps, inner)}
+    </SecureFenceBehaviorContext.Provider>
   )
 }

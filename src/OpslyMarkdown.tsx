@@ -7,7 +7,7 @@ import {
 import Markdown, { type Components, type Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Options as RemarkRehypeOptions } from 'remark-rehype'
-import { SecureBlock } from './SecureBlock.js'
+import { SecureBlock, type SecureBlockOptions } from './SecureBlock.js'
 import {
   OPSLY_MASK_DATA_ATTR,
   secureFenceHandlers,
@@ -46,14 +46,17 @@ function isSecureFenceHostDiv(props: DivProps): boolean {
  * Merges user `components` with the secure-fence `div` → `SecureBlock` mapping.
  * Forwards the same `pre` / `code` implementations into `SecureBlock` so styling
  * matches normal fenced blocks.
+ *
+ * @param secureBlockOptions Optional extras for every `SecureBlock` (`groupLabel`; no UI in package).
  */
 export function createOpslyMarkdownComponents(
   base: Components | null | undefined,
+  secureBlockOptions?: SecureBlockOptions,
 ): Components {
   const userDiv = base?.div
   const userPre = base?.pre
   const rawCode = base?.code
-  const safeCode = createSafeCodeComponent(rawCode, userPre)
+  const safeCode = createSafeCodeComponent(rawCode, userPre, secureBlockOptions)
 
   return {
     ...(base ?? {}),
@@ -63,7 +66,7 @@ export function createOpslyMarkdownComponents(
 
       if (isSecureFenceHostDiv(props)) {
         return (
-          <SecureBlock pre={userPre} code={safeCode}>
+          <SecureBlock pre={userPre} code={safeCode} {...secureBlockOptions}>
             {children}
           </SecureBlock>
         )
@@ -96,20 +99,22 @@ export type OpslyMarkdownProps = Omit<
   'remarkPlugins' | 'remarkRehypeOptions' | 'components'
 > & {
   components?: Components
+  /** Pass-through for every `SecureBlock` (`groupLabel` only; reveal UI stays in app). */
+  secureBlockProps?: SecureBlockOptions
 }
 
 /**
- * Opinionated `react-markdown` wrapper: GFM + secure fences + semantic host markup.
- * Visual styling is owned by the application (see README).
+ * `react-markdown` wrapper: GFM + secure fences + behavior-only `SecureBlock` wiring.
+ * Reveal/copy/toolbars come from `components.pre` via {@link useSecureFenceBehavior}.
  */
 export function OpslyMarkdown(props: OpslyMarkdownProps) {
-  const { components, ...rest } = props
+  const { components, secureBlockProps, ...rest } = props
 
   return (
     <Markdown
       remarkPlugins={[...opslyMaskRemarkPlugins]}
       remarkRehypeOptions={opslyMaskRemarkRehypeOptions()}
-      components={createOpslyMarkdownComponents(components)}
+      components={createOpslyMarkdownComponents(components, secureBlockProps)}
       {...rest}
     />
   )

@@ -20,4 +20,4 @@ After the block.
 
 ---
 
-Styling matches **`pre` / `code`** like normal fenced blocks; see [`README.md`](../README.md#code-block-integration).
+Styling and reveal controls follow your Markdown setup; see [`README.md`](../README.md#basic-usage-opslymarkdown).

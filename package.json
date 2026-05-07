@@ -1,7 +1,7 @@
 {
   "name": "opsly-mask",
-  "version": "0.7.0",
-  "description": "Semantic secure fenced markdown for react-markdown (mask/reveal UI; styling in your app)",
+  "version": "0.9.0",
+  "description": "UI-agnostic ```secure fenced markdown for react-markdown (mask/reveal semantics; controls in your app)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,7 +29,9 @@
     "remark",
     "secure-block",
     "masked-content",
-    "opsly"
+    "opsly",
+    "behavior-first",
+    "ui-agnostic"
   ],
   "author": "",
   "license": "MIT",
@@ -39,7 +41,6 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "lucide-react": "^1.14.0",
     "mdast-util-to-hast": "^13.2.1",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
