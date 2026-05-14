@@ -1,0 +1,92 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in the Opsly Mask Plugin
+title: "[Bug]: "
+labels:
+  - bug
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+
+        Please provide enough detail to reproduce the issue clearly.
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: VS Code version / OS / Plugin version
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      options:
+        - Extension activation
+        - Masking workflow
+        - Encryption/Decryption
+        - Editor integration
+        - Markdown handling
+        - Command palette
+        - Clipboard interaction
+        - Settings/configuration
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      placeholder: Describe the issue clearly
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Open...
+        2. Run command...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      placeholder: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or Screenshots
+      placeholder: Paste extension logs, console output, screenshots, or stack traces if relevant
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true

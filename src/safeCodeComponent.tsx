@@ -25,7 +25,7 @@ export function createSafeCodeComponent(
   secureBlockOptions?: SecureBlockOptions,
 ): NonNullable<Components['code']> {
   return function SafeCode(props: MarkdownCodeProps) {
-    const { inline, className, children, node, ...rest } = props
+    const { inline, className, children, node: _node, ...rest } = props
     const maskContent = (props as Record<string, unknown>)[
       'data-opsly-mask-content'
     ]

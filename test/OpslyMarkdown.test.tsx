@@ -40,7 +40,7 @@ function MarkdownPre(props: PreAttrs) {
 describe('OpslyMarkdown rendering', () => {
   it('emits secure host markup for ```secure without metadata (no built-in toggle)', () => {
     const md = '```secure\nSECRET=value\n```'
-    const html = renderToStaticMarkup(createElement(OpslyMarkdown, { children: md }))
+    const html = renderToStaticMarkup(createElement(OpslyMarkdown, null, md))
     expect(html).toContain('data-opsly-mask')
     expect(html).toContain('data-opsly-mask-content')
     expect(html).not.toContain('data-opsly-mask-toggle')
@@ -49,10 +49,7 @@ describe('OpslyMarkdown rendering', () => {
   it('lets consumers add a toggle via `components.pre` + useSecureFenceBehavior', () => {
     const md = '```secure\nSECRET=value\n```'
     const html = renderToStaticMarkup(
-      createElement(OpslyMarkdown, {
-        children: md,
-        components: { pre: MarkdownPre },
-      }),
+      createElement(OpslyMarkdown, { components: { pre: MarkdownPre } }, md),
     )
     expect(html).toContain('data-opsly-mask-toggle')
     expect(html).toContain('Toggle')
@@ -62,13 +59,13 @@ describe('OpslyMarkdown rendering', () => {
 
   it('emits secure host markup for ```secure with metadata', () => {
     const md = '```secure id="example"\nSECRET=value\n```'
-    const html = renderToStaticMarkup(createElement(OpslyMarkdown, { children: md }))
+    const html = renderToStaticMarkup(createElement(OpslyMarkdown, null, md))
     expect(html).toContain('data-opsly-mask')
   })
 
   it('treats ```secure id="prod" as a secure fence', () => {
     const md = '```secure id="prod"\nSECRET=value\n```'
-    const html = renderToStaticMarkup(createElement(OpslyMarkdown, { children: md }))
+    const html = renderToStaticMarkup(createElement(OpslyMarkdown, null, md))
     expect(html).toContain('data-opsly-mask')
     expect(html).toContain('data-revealed="false"')
     expect(html).toContain('language-secure')
@@ -77,7 +74,7 @@ describe('OpslyMarkdown rendering', () => {
 
   it('does not wrap normal fences in secure host', () => {
     const md = '```javascript\nconst x = 1\n```'
-    const html = renderToStaticMarkup(createElement(OpslyMarkdown, { children: md }))
+    const html = renderToStaticMarkup(createElement(OpslyMarkdown, null, md))
     expect(html).not.toContain('data-opsly-mask-toggle')
     expect(html).not.toContain('data-opsly-mask')
     expect(html).not.toContain('language-secure')
