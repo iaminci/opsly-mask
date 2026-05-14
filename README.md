@@ -17,10 +17,6 @@ Secure fences flow through the same remark/rehype integration as ordinary code b
 
 The package runs in normal **`react-markdown`** setups, including **SSR**: the usual server HTML is masked; reveal depends on client-side state once your toggle and **`useSecureFenceBehavior`** run in the browser.
 
-## Preview
-
-![opsly-mask preview](./assets/preview.png)
-
 ## Why
 
 Internal docs often hold API keys, tokens, URLs, and config snippets. This library **reduces accidental exposure** during:
