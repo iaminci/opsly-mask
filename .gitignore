@@ -37,3 +37,4 @@ Thumbs.db
 
 # Optional local tooling
 .turbo/
+.pnpm-store/
