@@ -1,6 +1,6 @@
 {
   "name": "opsly-mask",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "UI-agnostic ```secure fenced markdown for react-markdown (mask/reveal semantics; controls in your app)",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,6 +15,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./crypto": {
+      "types": "./dist/crypto/index.d.ts",
+      "import": "./dist/crypto/index.js"
     }
   },
   "sideEffects": false,
